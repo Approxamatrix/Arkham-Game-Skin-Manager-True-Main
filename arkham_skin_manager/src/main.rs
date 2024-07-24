@@ -2,12 +2,35 @@ use std::fs::*;
 use std::io;
 use std::path::Path;
 use fs_extra::*;
+use serde::*;
+use serde_json::json;
 fn main() {
 
     //I'll figure out the whole file structure stuff and reading the profile config file later.....
    functionselection();
 }
 
+
+struct modinfo{
+
+    modname : String,
+    modfolderpath : String,
+    pathingame : String,
+    active : bool,
+
+}
+
+struct profileconfig{
+
+    profilename : String,
+    //maybe put the game here via an enum ??
+    mods : [modinfo],
+
+
+
+
+
+}
 
 fn profileselection(){
 
@@ -38,7 +61,8 @@ fn functionselection(){
     println!("4. Save mod loadout \n");
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
-    obtainmodfile();
+   /// obtainmodfile();
+   readconfigfile()
     // a match statement will be used to select a menu item :3
 
 
@@ -107,4 +131,59 @@ fn obtainmodfile() {
 
 
    
+}
+
+
+fn readconfigfile(){
+
+// this will use the serde_json crate to read the file and print the info.
+    let json = json!(
+        {
+
+
+            "name" : "idk",
+        
+            "mods" :
+            [
+                {
+                    "modname" : "Man",
+                    "modfolderpath" : "idk_lmao",
+                    "pathingame" : "idk",
+                    "active" : true
+                },
+        
+        
+                {
+                    "modname" : "Lego Batman",
+                    "modfolderpath" : "idk_lmao",
+                    "pathingame" : "idk",
+                    "active" : true
+                },
+        
+                {
+                    "modname" : "The Batman",
+                    "modfolderpath" : "idk_lmao",
+                    "pathingame" : "idk",
+                    "active" : true
+                }
+               
+            ]
+                       
+     
+        }
+
+
+    );
+
+// use for loops for this , okie dokie ?
+    println!(
+    "Name: {} \nMod name : {} \nMod Path : {} \nPath In Game Files : {} \nActive ? : {}", 
+    json["name"], 
+    json["mods"][0]["modname"],
+    json["mods"][0]["modfolderpath"],
+    json["mods"][0]["pathingame"],
+    json["mods"][0]["active"]
+)
+
+
 }
