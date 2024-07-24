@@ -3,6 +3,8 @@ use std::io;
 use std::path::Path;
 use fs_extra::*;
 use serde::*;
+use serde_json::from_str;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 fn main() {
 
@@ -10,8 +12,8 @@ fn main() {
    functionselection();
 }
 
-
-struct modinfo{
+#[derive(Serialize, Deserialize)]
+struct ModInfo{
 
     modname : String,
     modfolderpath : String,
@@ -20,11 +22,12 @@ struct modinfo{
 
 }
 
-struct profileconfig{
+#[derive(Serialize, Deserialize)]
+struct ProfileConfig{
 
-    profilename : String,
+    name : String,
     //maybe put the game here via an enum ??
-    mods : [modinfo],
+    mods : Vec<ModInfo>,
 
 
 
@@ -62,7 +65,7 @@ fn functionselection(){
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
    /// obtainmodfile();
-   readconfigfile()
+   readconfigfile();
     // a match statement will be used to select a menu item :3
 
 
@@ -134,11 +137,11 @@ fn obtainmodfile() {
 }
 
 
-fn readconfigfile(){
+fn readconfigfile() {
 
 // this will use the serde_json crate to read the file and print the info.
-    let json = json!(
-        {
+    let json0= 
+        r#"{
 
 
             "name" : "idk",
@@ -170,20 +173,28 @@ fn readconfigfile(){
             ]
                        
      
-        }
-
-
-    );
+        }"#;
 
 // use for loops for this , okie dokie ?
-    println!(
-    "Name: {} \nMod name : {} \nMod Path : {} \nPath In Game Files : {} \nActive ? : {}", 
-    json["name"], 
-    json["mods"][0]["modname"],
-    json["mods"][0]["modfolderpath"],
-    json["mods"][0]["pathingame"],
-    json["mods"][0]["active"]
-)
+   // println!("Name : {}\n", json0["name"]);
 
+    let config : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
+    println!("{}",config.name);
+    //for mods in 1 ..11 {
 
+        
+    /*  println!(
+        "Mod name : {} \nMod Path : {} \nPath In Game Files : {} \nActive ? : {}", 
+       
+    json0["mods"][mods]["modname"],
+        json0["mods"][mods]["modfolderpath"],
+        json0["mods"][mods]["pathingame"],
+        json0["mods"][mods]["active"]
+        
+    ) */
+    
+        
+   // }
+
+   
 }
