@@ -26,6 +26,7 @@ struct ModInfo{
 struct ProfileConfig{
 
     name : String,
+    dlc_folder : String,
     //maybe put the game here via an enum ??
     mods : Vec<ModInfo>,
 
@@ -145,7 +146,7 @@ fn readconfigfile() {
 
 
             "name" : "idk",
-        
+            "dlc_folder" : "e",
             "mods" :
             [
                 {
@@ -157,14 +158,14 @@ fn readconfigfile() {
         
         
                 {
-                    "modname" : "Lego Batman",
+                    "modname" : "idk man",
                     "modfolderpath" : "idk_lmao",
                     "pathingame" : "idk",
                     "active" : true
                 },
         
                 {
-                    "modname" : "The Batman",
+                    "modname" : "idk man2",
                     "modfolderpath" : "idk_lmao",
                     "pathingame" : "idk",
                     "active" : true
