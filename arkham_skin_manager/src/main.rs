@@ -1,11 +1,16 @@
 use std::fs::*;
 use std::io;
+use std::path;
 use std::path::Path;
+use std::path::PathBuf;
 use fs_extra::*;
 use serde::*;
 use serde_json::from_str;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use serde_json::json;
+
+
 fn main() {
 
     //I'll figure out the whole file structure stuff and reading the profile config file later.....
@@ -13,22 +18,25 @@ fn main() {
 }
 
 #[derive(Serialize, Deserialize)]
-struct ModInfo{
+struct ModInfo<'a>{
 
     modname : String,
-    modfolderpath : String,
-    pathingame : String,
+    #[serde(borrow)]
+    modfolderpath :  Cow<'a, str>,
+    #[serde(borrow)]
+    pathingame :  Cow<'a, str>,
     active : bool,
 
 }
 
 #[derive(Serialize, Deserialize)]
-struct ProfileConfig{
+struct ProfileConfig<'a>{
 
     name : String,
-    dlc_folder : String,
+    #[serde(borrow)]
+    dlc_folder : Cow<'a, str>,
     //maybe put the game here via an enum ??
-    mods : Vec<ModInfo>,
+    mods : Vec<ModInfo <'a>>,
 
 
 
@@ -65,14 +73,14 @@ fn functionselection(){
     println!("4. Save mod loadout \n");
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
-   /// obtainmodfile();
-   readconfigfile();
+    addmodfile();
+  // readconfigfile();
     // a match statement will be used to select a menu item :3
 
 
 }
 
-fn obtainmodfile() {
+fn addmodfile() {
 
     println!("Please drag the mod file into the terminal, okie ?\n");
 
@@ -85,14 +93,43 @@ fn obtainmodfile() {
     let mut sourcepath = Vec::new();
     sourcepath.push(modfilepath);
 
-    println!("Now enter the path where you want to copy the file into : \n");
-    let mut destpath = String::new();
+    //println!("Now enter the path where you want to copy the file into : \n");
+   // let mut destpath = String::new();
 
-    io::stdin().read_line(&mut destpath).expect("How did you break this ???? LMAO \n");
+
+//TODO : Instead of asking the user for the destination right away, check the mod folder and then scan the folders in that folder.
+
+// soo i guess i gotta make a function that returns the dlc path ??? also, write some code that scans the dlc folder for subfolders and displays them 
+//and lets you choose
+
+
+
+
+    //io::stdin().read_line(&mut destpath).expect("How did you break this ???? LMAO \n");
+
+    let destpath:String = modpathvalue();
 
     let destpath: &str = destpath.trim();
+       
+    println!("{destpath \n}");
+
+    scandlcfolder(destpath.to_string());
+
+
 
     println!("Okay that's all the info I needed :D\n");
+
+   // let folder_array = scandlcfolder(destpath.to_string());
+
+
+    //Time to make a function that scans the dlc folder and returns an array or vector containing the paths for each one.
+    // then the vector is iterated through in a for loop.
+    // the user has to input a number corresponding to the array index.
+    // upon sending the input, a reference to that input index is taken and the string in that index is sent to the copy function
+
+
+
+
 /*
     let renaming = rename(modfilepath.clone(), destpath.clone());
 
@@ -122,9 +159,9 @@ fn obtainmodfile() {
 
     let copyoptionstuff = dir::CopyOptions::new();
    // println!("{modfilepath}");
-    println!("{destpath}");
+   
 
-    fs_extra::copy_items(&sourcepath, destpath, &copyoptionstuff);
+  //  fs_extra::copy_items(&sourcepath, destpath, &copyoptionstuff);
     
     // first, prompt for the path of the file
     // second, prompt for the path you want to copy the file into (later on, when the config and stuff are setup, 
@@ -137,6 +174,80 @@ fn obtainmodfile() {
    
 }
 
+fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
+
+    let mut subfolders: Vec<PathBuf> = Vec::new();
+    for entry in read_dir(dlcfolderpath.to_string()).expect("What ? Help me !") {
+        let entry = entry.expect("uhhh failed to parse the entry in the JSON file ??? idk");
+        let path = entry.path();
+
+        if path.is_dir() {
+            //print!("{:?} \n", entry.path());
+            subfolders.push(path);
+            // now have this path be pushed into a vector and then return it.
+            
+        }
+        //
+        
+        
+    }
+    println!("{:?}",subfolders);
+    return subfolders;
+
+
+
+
+}
+
+
+fn modpathvalue() -> String{
+
+    let json0= 
+        r#"{
+
+
+            "name" : "idk",
+            "dlc_folder" : "C:\\Users\\Anish\\Desktop\\testingcopy\\dlc",
+            "mods" :
+            [
+                {
+                    "modname" : "Man",
+                    "modfolderpath" : "idk_lmao",
+                    "pathingame" : "idk",
+                    "active" : true
+                },
+        
+        
+                {
+                    "modname" : "idk man",
+                    "modfolderpath" : "idk_lmao",
+                    "pathingame" : "idk",
+                    "active" : true
+                },
+        
+                {
+                    "modname" : "idk man2",
+                    "modfolderpath" : "idk_lmao",
+                    "pathingame" : "idk",
+                    "active" : true
+                }
+               
+            ]
+                       
+     
+        }"#;
+
+
+        let parsedconfig : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
+        return parsedconfig.dlc_folder.to_string();
+
+
+
+
+
+
+
+}
 
 fn readconfigfile() {
 
