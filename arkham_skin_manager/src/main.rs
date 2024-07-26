@@ -93,8 +93,15 @@ fn addmodfile() {
 
     let modfilepath = modfilepath.trim();
 
+    println!("{:?}",modfilepath);
+   // let modfilepath = modfilepath.as_str();
+
+    
+
     let mut sourcepath = Vec::new();
     sourcepath.push(modfilepath);
+
+
 
     //println!("Now enter the path where you want to copy the file into : \n");
    // let mut destpath = String::new();
@@ -119,7 +126,37 @@ fn addmodfile() {
 
     let folder_array = scandlcfolder(destpath);
 
-    println!("{:?}",folder_array);
+    let mut counter :u32 = 0;
+    println!("Please enter the number corresponding to the folder that you want to add the mod to ! \n \n \n");
+    for folders in &folder_array{
+
+        println!("{} ---- {:?}",counter,folders);
+        
+        //println!("{:?}",folders);
+
+        counter = counter + 1;
+
+        //println!("{}", folder_array[folders]);
+
+
+
+    };
+
+    let mut folderselectionstring = String::new();
+
+    io::stdin().read_line(&mut folderselectionstring).expect("Not sure how you broke this but you did. Somehow you broke the selection thing for choosing which mod folder");
+    
+    let folderselectionstring = folderselectionstring.trim();
+
+    let folderselectionint : usize = folderselectionstring.parse().expect("failed to parse string");
+
+    
+
+    println!("{:?}",folder_array[folderselectionint]);
+
+    
+
+   // println!("{:?}",folder_array);
     //Time to make a function that scans the dlc folder and returns an array or vector containing the paths for each one.
     // then the vector is iterated through in a for loop.
     // the user has to input a number corresponding to the array index.
@@ -159,7 +196,7 @@ fn addmodfile() {
    // println!("{modfilepath}");
    
 
-  //  fs_extra::copy_items(&sourcepath, destpath, &copyoptionstuff);
+    fs_extra::copy_items(&sourcepath, &folder_array[folderselectionint], &copyoptionstuff);
     
     // first, prompt for the path of the file
     // second, prompt for the path you want to copy the file into (later on, when the config and stuff are setup, 
@@ -194,7 +231,7 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
         
     }
      
-    println!("{:?}",subfolders);
+  //  println!("{:?}",subfolders);
     println!("\nThere are {} dlc folders \n",subfolders.len());
     
     return subfolders;
@@ -218,7 +255,7 @@ fn modpathvalue()  -> String {
     println!("{:?}",dlcpathbutstr);
     //LMAO why does this work. this seems so jank to me lol. but i guess that's my inexperience showing :3c
 
-    
+
     return dlcpathbutstr.to_string();
   
 
