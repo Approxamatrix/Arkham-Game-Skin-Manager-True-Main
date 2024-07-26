@@ -5,11 +5,14 @@ use std::path::Path;
 use std::path::PathBuf;
 use fs_extra::*;
 use serde::*;
+use serde_json::from_reader;
 use serde_json::from_str;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::borrow::Cow;
 use serde_json::json;
-
+use std::io::BufReader;
+use std::cmp;
 
 fn main() {
 
@@ -102,26 +105,21 @@ fn addmodfile() {
 // soo i guess i gotta make a function that returns the dlc path ??? also, write some code that scans the dlc folder for subfolders and displays them 
 //and lets you choose
 
-
-
-
     //io::stdin().read_line(&mut destpath).expect("How did you break this ???? LMAO \n");
 
     let destpath:String = modpathvalue();
-
-    let destpath: &str = destpath.trim();
+    
+    // let destpath: &str = destpath.trim();
        
     println!("{destpath \n}");
 
-    scandlcfolder(destpath.to_string());
-
-
+    //scandlcfolder(destpath.to_string());
 
     println!("Okay that's all the info I needed :D\n");
 
-   // let folder_array = scandlcfolder(destpath.to_string());
+    let folder_array = scandlcfolder(destpath);
 
-
+    println!("{:?}",folder_array);
     //Time to make a function that scans the dlc folder and returns an array or vector containing the paths for each one.
     // then the vector is iterated through in a for loop.
     // the user has to input a number corresponding to the array index.
@@ -177,8 +175,12 @@ fn addmodfile() {
 fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 
     let mut subfolders: Vec<PathBuf> = Vec::new();
-    for entry in read_dir(dlcfolderpath.to_string()).expect("What ? Help me !") {
-        let entry = entry.expect("uhhh failed to parse the entry in the JSON file ??? idk");
+   // let dlcfolderpath1 = "C:\\Program Files\\Epic Games\\BatmanArkhamKnight\\DLC";
+
+    println!("{:?}",dlcfolderpath);
+    //println!("{:?}",dlcfolderpath1);
+    for entry in read_dir(dlcfolderpath).expect("What ? Help me !") {
+        let entry = entry.expect(" e ");
         let path = entry.path();
 
         if path.is_dir() {
@@ -191,7 +193,10 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
         
         
     }
+     
     println!("{:?}",subfolders);
+    println!("\nThere are {} dlc folders \n",subfolders.len());
+    
     return subfolders;
 
 
@@ -200,47 +205,22 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 }
 
 
-fn modpathvalue() -> String{
+fn modpathvalue()  -> String {
 
-    let json0= 
-        r#"{
+    let config = File::open("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("failed to read file !");
+    let configreader = BufReader::new(config);
+    let configread : Value = from_reader(configreader).expect("could not read json file ! ...i think ??? idk how this one works too well so idk...");
+    // let parsedconfig : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
+    
+    let dlcfolderpath = configread.get("dlc_folder").expect("couldn't read the DLC folder string from the config file !");
+    println!("{:?}",dlcfolderpath.to_string());
+    let dlcpathbutstr = dlcfolderpath.as_str().expect("Hmmm... I'm  pretty sure a string should be used here.....");
+    println!("{:?}",dlcpathbutstr);
+    //LMAO why does this work. this seems so jank to me lol. but i guess that's my inexperience showing :3c
 
-
-            "name" : "idk",
-            "dlc_folder" : "C:\\Users\\Anish\\Desktop\\testingcopy\\dlc",
-            "mods" :
-            [
-                {
-                    "modname" : "Man",
-                    "modfolderpath" : "idk_lmao",
-                    "pathingame" : "idk",
-                    "active" : true
-                },
-        
-        
-                {
-                    "modname" : "idk man",
-                    "modfolderpath" : "idk_lmao",
-                    "pathingame" : "idk",
-                    "active" : true
-                },
-        
-                {
-                    "modname" : "idk man2",
-                    "modfolderpath" : "idk_lmao",
-                    "pathingame" : "idk",
-                    "active" : true
-                }
-               
-            ]
-                       
-     
-        }"#;
-
-
-        let parsedconfig : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
-        return parsedconfig.dlc_folder.to_string();
-
+    
+    return dlcpathbutstr.to_string();
+  
 
 
 
@@ -248,6 +228,8 @@ fn modpathvalue() -> String{
 
 
 }
+
+
 
 fn readconfigfile() {
 
