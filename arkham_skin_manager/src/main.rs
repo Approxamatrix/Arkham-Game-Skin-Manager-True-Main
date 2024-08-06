@@ -92,11 +92,9 @@ fn addmodfile() {
     io::stdin().read_line(&mut modfilepath).expect("Hey dipshit !! what the fuck did you do ???? \n");
 
     let modfilepath = modfilepath.trim();
-
+    let modfileconverted: PathBuf = modfilepath.clone().parse::<PathBuf>().expect("Failed to get the path for the mod file or smth idk");
     println!("{:?}",modfilepath);
    // let modfilepath = modfilepath.as_str();
-
-    
 
     let mut sourcepath = Vec::new();
     sourcepath.push(modfilepath);
@@ -198,6 +196,29 @@ fn addmodfile() {
 
     fs_extra::copy_items(&sourcepath, &folder_array[folderselectionint], &copyoptionstuff);
     
+
+    println!("Folder selected : {:?} \n",&folder_array[folderselectionint]);
+
+    let modfilename ;
+
+    let decoystring = "idk";
+    
+    match modfileconverted.file_name(){
+    
+    Some(idk) => modfilename = idk.to_str() ,    
+    None => { modfilename = Some(decoystring);
+        println!("something went wrong with getting the file name")},
+
+
+    };
+
+    let truefinalmodfilepath : String = (folder_array[folderselectionint].to_string_lossy() + "\\").to_string() + modfilename.expect("failed to get the mod's directory's name !") ;
+
+    println!("{}",truefinalmodfilepath);
+    
+  // println!("Name of file : {}",modfileconverted.file_name());
+    
+
     // first, prompt for the path of the file
     // second, prompt for the path you want to copy the file into (later on, when the config and stuff are setup, 
     // it will look into the arkham game's dlc folder 
