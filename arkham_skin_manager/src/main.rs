@@ -8,38 +8,64 @@ use serde::*;
 use serde_json::from_reader;
 use serde_json::from_str;
 use serde::{Deserialize, Serialize};
+use serde_json::to_string;
 use serde_json::Value;
 use std::borrow::Cow;
 use serde_json::json;
 use std::io::BufReader;
 use std::cmp;
+use std::error::Error;
 
 fn main() {
 
     //I'll figure out the whole file structure stuff and reading the profile config file later.....
    functionselection();
 }
-
+/*
 #[derive(Serialize, Deserialize)]
+#[derive(Debug)]
 struct ModInfo<'a>{
 
-    modname : String,
+    modname : &'a str,
     #[serde(borrow)]
     modfolderpath :  Cow<'a, str>,
-    #[serde(borrow)]
-    pathingame :  Cow<'a, str>,
     active : bool,
 
 }
 
+
 #[derive(Serialize, Deserialize)]
+#[derive(Debug)]
 struct ProfileConfig<'a>{
 
-    name : String,
+    name : &'a str,
     #[serde(borrow)]
     dlc_folder : Cow<'a, str>,
     //maybe put the game here via an enum ??
     mods : Vec<ModInfo <'a>>,
+
+
+*/
+    
+#[derive(Serialize, Deserialize)]
+#[derive(Debug)]
+struct ModInfo{
+
+    modname : String,
+    modfolderpath : String,
+    active : bool,
+
+}
+
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug)]
+struct ProfileConfig{
+
+    name : String,
+    dlc_folder : String,
+    //maybe put the game here via an enum ??
+    mods : Vec<ModInfo>,
 
 
 
@@ -76,7 +102,8 @@ fn functionselection(){
     println!("4. Save mod loadout \n");
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
-    addmodfile();
+    //addmodfile();
+    readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
   // readconfigfile();
     // a match statement will be used to select a menu item :3
 
@@ -148,8 +175,7 @@ fn addmodfile() {
 
     let folderselectionint : usize = folderselectionstring.parse().expect("failed to parse string");
 
-    
-
+  
     println!("{:?}",folder_array[folderselectionint]);
 
     
@@ -215,6 +241,22 @@ fn addmodfile() {
     let truefinalmodfilepath : String = (folder_array[folderselectionint].to_string_lossy() + "\\").to_string() + modfilename.expect("failed to get the mod's directory's name !") ;
 
     println!("{}",truefinalmodfilepath);
+
+
+    //Time to mess with structs
+
+    let addedmodstruct = ModInfo{
+
+        modname : modfilename.expect("idk").to_string(),
+        modfolderpath : truefinalmodfilepath.into(),
+        active : true
+
+    };
+
+    let jsonformatteddata = to_string(&addedmodstruct);
+
+
+    println!("{:#?} \n",jsonformatteddata);
     
   // println!("Name of file : {}",modfileconverted.file_name());
     
@@ -289,49 +331,30 @@ fn modpathvalue()  -> String {
 
 
 
-fn readconfigfile() {
+fn readconfigfile(cfgpath : &Path) {
 
 // this will use the serde_json crate to read the file and print the info.
-    let json0= 
-        r#"{
-
-
-            "name" : "idk",
-            "dlc_folder" : "e",
-            "mods" :
-            [
-                {
-                    "modname" : "Man",
-                    "modfolderpath" : "idk_lmao",
-                    "pathingame" : "idk",
-                    "active" : true
-                },
-        
-        
-                {
-                    "modname" : "idk man",
-                    "modfolderpath" : "idk_lmao",
-                    "pathingame" : "idk",
-                    "active" : true
-                },
-        
-                {
-                    "modname" : "idk man2",
-                    "modfolderpath" : "idk_lmao",
-                    "pathingame" : "idk",
-                    "active" : true
-                }
-               
-            ]
-                       
-     
-        }"#;
 
 // use for loops for this , okie dokie ?
    // println!("Name : {}\n", json0["name"]);
 
-    let config : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
-    println!("{}",config.name);
+
+    let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !");
+    
+    let bufferedreader = BufReader::new(cfgfile);
+
+    let cfgdata : ProfileConfig = from_reader(bufferedreader).expect("msg");
+
+    //.expect("failed to parse data from cfg JSON file !");
+
+    println!("{:#?}",cfgdata);
+
+}
+
+
+
+    //let config : ProfileConfig = serde_json::from_reader().expect("Oh noes ! Failed to parse JSON !");
+   // println!("{}",config.name);
     //for mods in 1 ..11 {
 
         
@@ -349,4 +372,3 @@ fn readconfigfile() {
    // }
 
    
-}
