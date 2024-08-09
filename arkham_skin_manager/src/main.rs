@@ -52,6 +52,7 @@ struct ProfileConfig<'a>{
 struct ModInfo{
 
     modname : String,
+    ogmodlocation : String,
     modfolderpath : String,
     active : bool,
 
@@ -248,6 +249,7 @@ fn addmodfile() {
     let addedmodstruct = ModInfo{
 
         modname : modfilename.expect("idk").to_string(),
+        ogmodlocation : modfilename.expect("idk").to_string(), //leave this until later.... too eepy
         modfolderpath : truefinalmodfilepath.into(),
         active : true
 
@@ -347,7 +349,9 @@ fn readconfigfile(cfgpath : &Path) {
 
     //.expect("failed to parse data from cfg JSON file !");
 
-    println!("{:#?}",cfgdata);
+    println!("{:#?} \n",cfgdata);
+
+    println!("The number of mods present is....... {:#?} !\n",cfgdata.mods.len());
 
 }
 
