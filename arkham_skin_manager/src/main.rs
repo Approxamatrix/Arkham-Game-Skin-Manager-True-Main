@@ -23,7 +23,12 @@ use std::error::Error;
 fn main() {
 
     //I'll figure out the whole file structure stuff and reading the profile config file later.....
-   addmodfile();
+  // addmodfile();
+  //change_mod_loadout();
+
+  startup();
+
+
 }
 /*
 #[derive(Serialize, Deserialize)]
@@ -108,13 +113,29 @@ fn functionselection(){
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
     //addmodfile();
-    let tempcfgpath : &Path = Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json");
-    readconfigfile(tempcfgpath);
+
+
+   // let tempcfgpath : &Path = Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json");
+   // readconfigfile(tempcfgpath);
+
+//   change_mod_loadout()
+
   // readconfigfile();
     // a match statement will be used to select a menu item :3
 
 
 }
+
+
+fn startup(){
+
+let maincfg = File::open("maincfg.json").expect("the main config file doesn't exist !!!");
+
+
+
+}
+
+
 
 fn addmodfile() {
 
@@ -326,7 +347,7 @@ fn readconfigfile(cfgpath : &Path) -> ProfileConfig {
     
     let bufferedreader = BufReader::new(cfgfile);
 
-    let cfgdata : ProfileConfig = from_reader(bufferedreader).expect("msg");
+    let cfgdata : ProfileConfig = from_reader(bufferedreader).expect("failed to fetch data from config file !");
 
     //.expect("failed to parse data from cfg JSON file !");
 
@@ -365,8 +386,7 @@ fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
     //println!("function has received the following json file :");
     //println!("\n\n\n\n{:#?}",cfgdata);
 
-    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
-
+    
     println!("number of mods : {}",cfgdata.mods.len());
 
 
@@ -376,6 +396,56 @@ fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
 
     println!("{:#?}",cfgdata);
 
+    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+
     //let cfgdata = to_string(&cfgdata).expect("failed to convert to string")
     to_writer_pretty(&mut file, &cfgdata).expect("Failed to write to file !");
+}
+
+fn change_mod_loadout()
+{
+    
+    let mut jsonfile = readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+    let mut modindex = 0;
+
+    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+
+
+    for mods in &jsonfile.mods
+    { 
+        modindex = modindex+1;
+        println!("{} . Mod : {:#?} \nEnabled ? : {}\n\n",&modindex,mods.modname,mods.active);
+    }
+
+    println!("enter the index of the mod you want to toggle");
+
+    let mut modselection : String = String::new();
+
+    io::stdin().read_line(&mut modselection).expect("failed to read line !");
+
+    let mut modselection = modselection.trim();
+
+    let mut modselection:usize = modselection.parse().expect("failed to parse selection !");
+
+    let mut modselection = modselection - 1;
+    //println!("{:#?}",jsonfile.mods[modselection]);
+
+    
+
+    if (jsonfile.mods[modselection].active == true){
+
+        jsonfile.mods[modselection].active = false;
+        std::fs::remove_dir_all( &jsonfile.mods[modselection].modfolderpath).expect("failed to delete directory");
+    }
+
+    else{
+
+        jsonfile.mods[modselection].active = true;
+
+    }
+
+  //  println!("{:#?}",jsonfile.mods[modselection]);
+
+    to_writer_pretty(&mut file, &jsonfile).expect("Failed to write to file !");
+
 }
