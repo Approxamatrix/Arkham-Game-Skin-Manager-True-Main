@@ -12,6 +12,7 @@ use serde_json::from_str;
 use serde::{Deserialize, Serialize};
 use serde_json::to_string;
 use serde_json::to_writer;
+use serde_json::to_writer_pretty;
 use serde_json::Value;
 use std::borrow::Cow;
 use serde_json::json;
@@ -376,5 +377,5 @@ fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
     println!("{:#?}",cfgdata);
 
     //let cfgdata = to_string(&cfgdata).expect("failed to convert to string")
-    to_writer(&mut file, &cfgdata).expect("Failed to write to file !");
+    to_writer_pretty(&mut file, &cfgdata).expect("Failed to write to file !");
 }
