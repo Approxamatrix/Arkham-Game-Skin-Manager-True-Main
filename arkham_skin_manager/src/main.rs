@@ -1,5 +1,7 @@
 use std::fs::*;
 use std::io;
+use std::io::BufWriter;
+use std::io::Read;
 use std::path;
 use std::path::Path;
 use std::path::PathBuf;
@@ -9,6 +11,7 @@ use serde_json::from_reader;
 use serde_json::from_str;
 use serde::{Deserialize, Serialize};
 use serde_json::to_string;
+use serde_json::to_writer;
 use serde_json::Value;
 use std::borrow::Cow;
 use serde_json::json;
@@ -19,7 +22,7 @@ use std::error::Error;
 fn main() {
 
     //I'll figure out the whole file structure stuff and reading the profile config file later.....
-   functionselection();
+   addmodfile();
 }
 /*
 #[derive(Serialize, Deserialize)]
@@ -104,7 +107,8 @@ fn functionselection(){
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
     //addmodfile();
-    readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+    let tempcfgpath : &Path = Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json");
+    readconfigfile(tempcfgpath);
   // readconfigfile();
     // a match statement will be used to select a menu item :3
 
@@ -146,7 +150,7 @@ fn addmodfile() {
        
     println!("{destpath \n}");
 
-    //scandlcfolder(destpath.to_string());
+    scandlcfolder(destpath.to_string());
 
     println!("Okay that's all the info I needed :D\n");
 
@@ -181,7 +185,6 @@ fn addmodfile() {
 
     
 
-   // println!("{:?}",folder_array);
     //Time to make a function that scans the dlc folder and returns an array or vector containing the paths for each one.
     // then the vector is iterated through in a for loop.
     // the user has to input a number corresponding to the array index.
@@ -189,32 +192,6 @@ fn addmodfile() {
 
 
 
-
-/*
-    let renaming = rename(modfilepath.clone(), destpath.clone());
-
-    let renamingresult: Result<(), std::io::Error> = match renaming{
-        Ok(_) => {
-            println!("File copied successfully !");
-            Ok(())
-
-        }
-        Err(e) => {
-            
-            println!("Failed to copy mod ! D: ");
-
-            Err(e)
-        
-
-        }
-
-
-    };
- */
-
-    
-//Todo okay, since i'm using the fs_extra crate now, i can use it to copy a directory to a location. so don't write my own code for that
-// just use the crate for that.
 
 
     let copyoptionstuff = dir::CopyOptions::new();
@@ -255,10 +232,10 @@ fn addmodfile() {
 
     };
 
-    let jsonformatteddata = to_string(&addedmodstruct);
+    //let jsonformatteddata = to_string(&addedmodstruct).expect("failed to convert json to string !");
 
 
-    println!("{:#?} \n",jsonformatteddata);
+   // println!("{:#?} \n",jsonformatteddata);
     
   // println!("Name of file : {}",modfileconverted.file_name());
     
@@ -270,6 +247,9 @@ fn addmodfile() {
 
     // next, pass the paths into std::fs::copy and let the magic happen !
 
+    let cfgfile = readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+
+    add_mod_to_cfg(cfgfile,addedmodstruct);
 
    
 }
@@ -333,7 +313,7 @@ fn modpathvalue()  -> String {
 
 
 
-fn readconfigfile(cfgpath : &Path) {
+fn readconfigfile(cfgpath : &Path) -> ProfileConfig {
 
 // this will use the serde_json crate to read the file and print the info.
 
@@ -352,6 +332,8 @@ fn readconfigfile(cfgpath : &Path) {
     println!("{:#?} \n",cfgdata);
 
     println!("The number of mods present is....... {:#?} !\n",cfgdata.mods.len());
+
+    return cfgdata;
 
 }
 
@@ -376,3 +358,23 @@ fn readconfigfile(cfgpath : &Path) {
    // }
 
    
+fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
+{
+
+    //println!("function has received the following json file :");
+    //println!("\n\n\n\n{:#?}",cfgdata);
+
+    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+
+    println!("number of mods : {}",cfgdata.mods.len());
+
+
+    let modcount = cfgdata.mods.len();
+
+    cfgdata.mods.push(jsonformatteddata);
+
+    println!("{:#?}",cfgdata);
+
+    //let cfgdata = to_string(&cfgdata).expect("failed to convert to string")
+    to_writer(&mut file, &cfgdata).expect("Failed to write to file !");
+}
