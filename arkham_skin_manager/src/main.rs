@@ -26,8 +26,8 @@ fn main() {
   // addmodfile();
   //change_mod_loadout();
 
-  startup();
-
+ // startup();
+    change_mod_loadout();
 
 }
 /*
@@ -62,11 +62,19 @@ struct ModInfo{
 
     modname : String,
     ogmodlocation : String,
+    rootmodfolder: String,
     modfolderpath : String,
     active : bool,
 
 }
 
+#[derive(Serialize, Deserialize)]
+#[derive(Debug)]
+struct MainConfig{
+    mod_backup_folder : String,
+  //  profiles : Vec<String>
+
+}
 
 #[derive(Serialize, Deserialize)]
 #[derive(Debug)]
@@ -249,6 +257,7 @@ fn addmodfile() {
 
         modname : modfilename.expect("idk").to_string(),
         ogmodlocation : modfilename.expect("idk").to_string(), //leave this until later.... too eepy
+        rootmodfolder : folder_array[folderselectionint].to_string_lossy().to_string(), //LMFAOOOOOO what on earth is this monstrosity of a string conversion !?!?! XD
         modfolderpath : truefinalmodfilepath.into(),
         active : true
 
@@ -440,7 +449,14 @@ fn change_mod_loadout()
 
     else{
 
+        let copyoptionstuff = dir::CopyOptions::new().overwrite(true);
+        let mut copypathvec = Vec::new();
+        copypathvec.push(jsonfile.mods[modselection].ogmodlocation.clone());
+        
+
         jsonfile.mods[modselection].active = true;
+        fs_extra::copy_items(&copypathvec, &jsonfile.mods[modselection].rootmodfolder,&copyoptionstuff).expect("failed to copy mod !");
+    
 
     }
 
