@@ -5,6 +5,7 @@ use std::io::Read;
 use std::path;
 use std::path::Path;
 use std::path::PathBuf;
+use std::vec;
 use fs_extra::*;
 use serde::*;
 use serde_json::from_reader;
@@ -27,7 +28,11 @@ fn main() {
   //change_mod_loadout();
 
  // startup();
-    change_mod_loadout();
+    
+    //change_mod_loadout();
+
+
+    delete_mod();
 
 }
 /*
@@ -57,7 +62,7 @@ struct ProfileConfig<'a>{
 */
     
 #[derive(Serialize, Deserialize)]
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct ModInfo{
 
     modname : String,
@@ -77,7 +82,7 @@ struct MainConfig{
 }
 
 #[derive(Serialize, Deserialize)]
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct ProfileConfig{
 
     name : String,
@@ -120,7 +125,7 @@ fn functionselection(){
     println!("4. Save mod loadout \n");
     println!("5. Back to profiles menu \n");
     println!("6. Exit Program \n");
-    //addmodfile();
+    //import_mod();
 
 
    // let tempcfgpath : &Path = Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json");
@@ -145,7 +150,7 @@ let maincfg = File::open("maincfg.json").expect("the main config file doesn't ex
 
 
 
-fn addmodfile() {
+fn import_mod() {
 
     println!("Please drag the mod file into the terminal, okie ?\n");
 
@@ -285,6 +290,10 @@ fn addmodfile() {
    
 }
 
+
+
+
+
 fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 
     let mut subfolders: Vec<PathBuf> = Vec::new();
@@ -409,6 +418,63 @@ fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
 
     //let cfgdata = to_string(&cfgdata).expect("failed to convert to string")
     to_writer_pretty(&mut file, &cfgdata).expect("Failed to write to file !");
+}
+
+fn delete_mod(){
+
+    let mut cfgfile = readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+
+    let mut index = 0;
+    for mods in &cfgfile.mods{
+
+        let index = index + 1;
+        println!("{:#?}",index);
+        println!("{:#?}",mods.modname);
+
+
+
+    }
+
+    let index = 0;
+    let mut modselection = String::new();
+    io::stdin().read_line(&mut modselection).expect("failed to read line !");
+
+    let mut modselection = modselection.trim();
+
+    let mut modselection:usize = modselection.parse().expect("failed to parse selection !");
+
+    let mut modselection = modselection - 1;
+
+
+    std::fs::remove_dir_all( &mut cfgfile.mods[modselection].modfolderpath).expect("failed to delete directory");
+
+    
+    std::fs::remove_dir_all( &mut cfgfile.mods[modselection].ogmodlocation).expect("failed to delete directory");
+
+
+    let alteredmodlist = remove_mod_from_cfg( cfgfile.clone(),index.try_into().unwrap());
+
+    
+    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+
+    cfgfile.mods = alteredmodlist.mods;
+    to_writer_pretty(&mut file, &cfgfile).expect("Failed to write to file !");
+
+
+    println!("Deleted mod !");
+
+}
+
+
+fn remove_mod_from_cfg(mut cfgdata : ProfileConfig, vecindex : i32) -> ProfileConfig{
+
+    println!("{}",vecindex);
+    cfgdata.mods.remove(vecindex.try_into().unwrap());
+    return cfgdata
+
+   
+
+
 }
 
 fn change_mod_loadout()
