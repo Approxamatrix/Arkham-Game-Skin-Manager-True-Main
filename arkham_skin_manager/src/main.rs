@@ -5,6 +5,7 @@ use std::io::Read;
 use std::path;
 use std::path::Path;
 use std::path::PathBuf;
+use std::process::exit;
 use std::vec;
 use fs_extra::*;
 use serde::*;
@@ -23,6 +24,25 @@ use std::error::Error;
 
 fn main() {
 
+    let alreadysetup = read_maincfg(Path::new("maincfg.json")).startupcompleted;
+
+    if alreadysetup == true{
+       
+
+    }
+
+    else{
+
+        startup();
+    }
+    
+
+    let mut selectedprofile = String::new();
+
+
+    let selectedprofile = profileselection();
+
+    functionselection(selectedprofile);
     //I'll figure out the whole file structure stuff and reading the profile config file later.....
   // addmodfile();
   //change_mod_loadout();
@@ -31,7 +51,9 @@ fn main() {
     
     //change_mod_loadout();
 
-    startup();
+  //  startup();
+
+  //  remove_profile();
     //delete_mod();
 
 }
@@ -113,39 +135,96 @@ struct ProfileConfig{
 
 }
 
-fn profileselection(){
+fn profileselection() -> String{
+
+    let mut selectedprofile = String::new();
+
+  
+
+    let maincfgdata = read_maincfg(Path::new("maincfg.json"));
+
+    let mut index = 0;
+
+    for profile in &maincfgdata.profiles{
+
+        println!("{}",index);
+        println!("{}",profile.profilename);
+
+        index = index + 1;
+
+    }
 
 
-    println!("Hello, world!");
 
-    println!("Create a new profile or select one ?");
+    println!("Select a profile from the ones listed above !");
 
-    println!("placeholder1");
+    io::stdin().read_line(&mut selectedprofile);
+    
+    selectedprofile = selectedprofile.trim().to_string();
 
-    println!("placeholder2");
+    let mut index = 0;
 
-    println!("placeholder3");
+    for profile in &maincfgdata.profiles{
 
-    println!("Create a new profile ! :D");
+        println!("{}",index);
+        println!("{}",profile.profilename);
 
+        index = index + 1;
+
+        if selectedprofile == profile.profilename{
+
+          //it should be fine ?? ( i have no idea)
+
+          println!("successfully selected profile !");
+        }
+
+        else {
+            
+            println!("No profile exists with the profile you have entered");
+            profileselection();
+            return  "null".to_string();
+        }
+
+    }
+
+
+    return selectedprofile;
 
 
 }
 
-fn functionselection(){
+fn functionselection(selectedprofile : String){
 
-    println!("stuff goes here... \n");
+    let mut featureselection = String::new();
+    
+    println!("Please choose a feature ! : \n");
 
     println!("1. Add a new mod \n");
     println!("2. Delete a mod \n");
     println!("3. Change mod loadout \n");
-    println!("4. Save mod loadout \n");
-    println!("5. Back to profiles menu \n");
+    println!("4. Back to profiles menu \n");
     println!("6. Exit Program \n");
-    //import_mod();
+
+    io::stdin().read_line(&mut featureselection);
+
+    featureselection = featureselection.trim().to_string();
+
+    let featureselection : u8 = featureselection.parse().expect("failed to convert to unsigned 8 bit integer");
+
+    match featureselection{
+
+        1=> {import_mod(selectedprofile)},
+        2=> {delete_mod(selectedprofile)},
+        3=> {change_mod_loadout(selectedprofile)},
+        4=> {profileselection();},
+        _ => {functionselection(selectedprofile.clone())}
+
+    }
+    println!("stuff goes here... \n");
+
+    //import_mod(selectedprofile);
 
 
-   // let tempcfgpath : &Path = Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json");
    // readconfigfile(tempcfgpath);
 
 //   change_mod_loadout()
@@ -205,7 +284,7 @@ fn create_new_profile(){
 
     let mut profilename= profilename.trim();
 
-    println!("Please enter the name of the game you're making !");
+    println!("Please enter the name of the game you're making the profile for !");
 
     let mut gamename: String = String::new();
 
@@ -284,7 +363,77 @@ fn create_profile_data(profilename: String,game: String,pathtoprofilecfg: String
 
 }
 
-fn import_mod() {
+fn remove_profile(){
+
+    let mut profilename: String = String::new();
+
+    io::stdin().read_line(&mut profilename);
+
+    let mut profilename = profilename.trim();
+
+    for dir in read_dir("profiles").expect("idklmao"){
+        
+        let dir = dir.expect("e");
+        let path = dir.path();
+        
+
+
+        if path.is_dir(){
+
+            if (path.file_name().expect("idk").to_string_lossy().to_string() == profilename){
+
+
+                remove_dir_all(path);
+                println!("successfully removed profile directory.")
+
+            }
+
+
+        }
+
+
+    }
+
+    delete_profiledata(profilename.to_string());
+
+}
+
+fn delete_profiledata(profilename: String){
+   
+    let mut profiledata: MainConfig = read_maincfg(Path::new("maincfg.json"));
+
+    let mut index = 0;
+
+    for profile in profiledata.profiles.clone(){
+
+        
+        if profile.profilename == profilename{
+            profiledata.profiles.remove(index);
+            println!("{}",profilename);
+            
+        }
+
+        index = index + 1;
+
+    }
+
+    
+    
+    let mut file : File = File::create("maincfg.json").expect("Failed to read cfg file !");
+
+    
+    to_writer_pretty(&mut file, &profiledata).expect("Failed to write to file !");
+
+
+
+    //look through profiles
+    // see if profile name is the same as the profile name provided,
+    // if it is, then delete it
+
+
+}
+
+fn import_mod(selectedprofile : String) {
 
     println!("Please drag the mod file into the terminal, okie ?\n");
 
@@ -313,7 +462,7 @@ fn import_mod() {
 
     //io::stdin().read_line(&mut destpath).expect("How did you break this ???? LMAO \n");
 
-    let destpath:String = modpathvalue();
+    let destpath:String = modpathvalue(selectedprofile.clone());
     
     // let destpath: &str = destpath.trim();
        
@@ -417,15 +566,12 @@ fn import_mod() {
 
     // next, pass the paths into std::fs::copy and let the magic happen !
 
-    let cfgfile = readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+    let cfgfile = readconfigfile(Path::new(&("profiles\\".to_owned() + &selectedprofile.clone() +"\\config\\profileconfig.json")));
 
-    add_mod_to_cfg(cfgfile,addedmodstruct);
+    add_mod_to_cfg(cfgfile,addedmodstruct,selectedprofile);
 
    
 }
-
-
-
 
 
 fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
@@ -461,9 +607,9 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 }
 
 
-fn modpathvalue()  -> String {
+fn modpathvalue(selectedprofile : String)  -> String {
 
-    let config = File::open("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("failed to read file !");
+    let config = File::open("profiles\\".to_owned() + &selectedprofile + "\\config\\profileconfig.json").expect("failed to read file !");
     let configreader = BufReader::new(config);
     let configread : Value = from_reader(configreader).expect("could not read json file ! ...i think ??? idk how this one works too well so idk...");
     // let parsedconfig : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
@@ -484,8 +630,6 @@ fn modpathvalue()  -> String {
 
 
 }
-
-
 
 fn readconfigfile(cfgpath : &Path) -> ProfileConfig {
 
@@ -528,7 +672,7 @@ fn readconfigfile(cfgpath : &Path) -> ProfileConfig {
    // }
 
    
-fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
+fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo, selectedprofile : String)
 {
 
     //println!("function has received the following json file :");
@@ -544,15 +688,15 @@ fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo)
 
     println!("{:#?}",cfgdata);
 
-    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+    let mut file : File = File::create("profiles\\".to_owned() + &selectedprofile+ "\\config\\profileconfig.json").expect("Failed to read cfg file !");
 
     //let cfgdata = to_string(&cfgdata).expect("failed to convert to string")
     to_writer_pretty(&mut file, &cfgdata).expect("Failed to write to file !");
 }
 
-fn delete_mod(){
+fn delete_mod(selectedprofile : String){
 
-    let mut cfgfile = readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+    let mut cfgfile = readconfigfile(Path::new(&( "profiles\\".to_owned() + &selectedprofile.clone() + "\\config\\profileconfig.json")));
 
     let mut index = 0;
     for mods in &cfgfile.mods{
@@ -585,7 +729,7 @@ fn delete_mod(){
     let alteredmodlist = remove_mod_from_cfg( cfgfile.clone(),index.try_into().unwrap());
 
     
-    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+    let mut file : File = File::create(&(selectedprofile.clone() + "\\config\\testconfig.json")).expect("Failed to read cfg file !");
 
     cfgfile.mods = alteredmodlist.mods;
     to_writer_pretty(&mut file, &cfgfile).expect("Failed to write to file !");
@@ -607,13 +751,13 @@ fn remove_mod_from_cfg(mut cfgdata : ProfileConfig, vecindex : i32) -> ProfileCo
 
 }
 
-fn change_mod_loadout()
+fn change_mod_loadout(selectedprofile : String)
 {
     
-    let mut jsonfile = readconfigfile(Path::new("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json"));
+    let mut jsonfile = readconfigfile(Path::new(&(selectedprofile.clone() + ("\\profileconfig.json"))) );
     let mut modindex = 0;
 
-    let mut file : File = File::create("C:\\Users\\Anish\\Desktop\\testingcopy\\config\\testconfig.json").expect("Failed to read cfg file !");
+    let mut file : File = File::create(selectedprofile + ("\\profileconfig.json")).expect("Failed to read cfg file !");
 
 
     for mods in &jsonfile.mods
