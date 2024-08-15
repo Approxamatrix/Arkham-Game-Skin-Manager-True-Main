@@ -31,8 +31,8 @@ fn main() {
     
     //change_mod_loadout();
 
-
-    delete_mod();
+    startup();
+    //delete_mod();
 
 }
 /*
@@ -77,9 +77,26 @@ struct ModInfo{
 #[derive(Debug)]
 struct MainConfig{
     mod_backup_folder : String,
-  //  profiles : Vec<String>
+    startupcompleted : bool,
+    profiles : Vec<ProfileInfo>
 
 }
+
+
+#[derive(Serialize, Deserialize)]
+#[derive(Debug,Clone)]
+
+struct ProfileInfo{
+
+    profilename : String,
+    game : String,
+    pathtoprofilecfg : String
+
+
+
+}
+
+
 
 #[derive(Serialize, Deserialize)]
 #[derive(Debug,Clone)]
@@ -142,13 +159,130 @@ fn functionselection(){
 
 fn startup(){
 
-let maincfg = File::open("maincfg.json").expect("the main config file doesn't exist !!!");
+
+
+
+println!("Hello, would you like to set up a profile ?
+\n1.Yes
+
+\n2.No");
+
+let mut profiledecision = String::new();
+
+io::stdin().read_line(&mut profiledecision).expect("Failed to read input");
+
+
+let mut profiledecision= profiledecision.trim();
+
+
+let profiledecisionint = profiledecision.parse::<i8>().expect("failed to convert profile decision to int");
+
+match profiledecisionint{
+
+    1 => create_new_profile(),
+    _ => println!("alright understood, the program will not create a profile.....\n\n"),
+
+    
+
+}
 
 
 
 }
 
 
+fn create_new_profile(){
+
+    println!("Profile creation started ! \n\n");
+
+
+    println!("Please enter a name for the profile");    
+
+    let mut profilename: String = String::new();
+
+    io::stdin().read_line(&mut profilename).expect("Failed to read input");
+
+
+    let mut profilename= profilename.trim();
+
+    println!("Please enter the name of the game you're making !");
+
+    let mut gamename: String = String::new();
+
+    io::stdin().read_line(&mut gamename).expect("Failed to read input");
+
+
+    let mut gamename= gamename.trim();
+
+    println!("Please wait.........\nCreating your profile.........");
+
+    let mut newprofilestring = String::new();
+    let mut newprofilestring = "profiles/".to_string() + profilename;
+    create_dir(newprofilestring.clone()).expect("failed to create folder");
+
+
+    let profiledata = create_profile_data(profilename.to_string(), gamename.to_string(), newprofilestring.to_string());
+
+    let mut cfgdata = read_maincfg(Path::new("maincfg.json"));
+
+    cfgdata.startupcompleted = true;
+
+    cfgdata.profiles.push(profiledata);
+
+    println!("{:#?}",cfgdata);
+
+    let mut file : File = File::create("maincfg.json").expect("Failed to read cfg file !");
+
+
+    to_writer_pretty(&file, &cfgdata);
+
+    println!("Finished completing profile !");
+    
+
+
+
+
+
+
+
+}
+
+fn read_maincfg(cfgpath : &Path)-> MainConfig{
+
+    let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !");
+    
+    let bufferedreader = BufReader::new(cfgfile);
+
+    let cfgdata : MainConfig = from_reader(bufferedreader).expect("failed to fetch data from config file !");
+
+    //.expect("failed to parse data from cfg JSON file !");
+    
+
+    println!("{:#?} \n",cfgdata);
+
+
+    return cfgdata;
+
+
+
+
+}
+fn create_profile_data(profilename: String,game: String,pathtoprofilecfg: String) ->ProfileInfo {
+
+    let profiledata = ProfileInfo{
+        
+        profilename,
+        game,
+        pathtoprofilecfg,
+    
+
+    };
+
+
+
+    return profiledata;
+
+}
 
 fn import_mod() {
 
@@ -356,10 +490,6 @@ fn modpathvalue()  -> String {
 fn readconfigfile(cfgpath : &Path) -> ProfileConfig {
 
 // this will use the serde_json crate to read the file and print the info.
-
-// use for loops for this , okie dokie ?
-   // println!("Name : {}\n", json0["name"]);
-
 
     let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !");
     
