@@ -321,7 +321,11 @@ fn create_new_profile(){
     let mut newprofilestring = String::new();
     let mut newprofilestring = "profiles/".to_string() + profilename;
     create_dir(newprofilestring.clone()).expect("failed to create folder");
+    create_dir(newprofilestring.clone() + "\\mods" ).expect("failed to create mods folder");
 
+    let mut profileconfignew : File = File::create_new(newprofilestring.clone() + "//profileconfig.json").expect("Failed to read cfg file !");
+
+    generate_profilecfg(profilename.to_string(),"idk".to_string(),(newprofilestring.clone() + "//profileconfig.json"));
 
     let profiledata = create_profile_data(profilename.to_string(), gamename.to_string(), newprofilestring.to_string());
 
@@ -369,6 +373,26 @@ fn read_maincfg(cfgpath : &Path)-> MainConfig{
 
 
 }
+
+fn generate_profilecfg(profilename: String,dlcfolderpath : String,profilecfgpath : String){
+
+
+    let newprofile = ProfileConfig{
+        name : profilename,
+        dlc_folder : dlcfolderpath,
+        mods : Vec::new(),
+        
+    };
+
+    let mut newconfig = File::create(Path::new(&profilecfgpath)).expect("failed to create file !");
+
+    to_writer_pretty(newconfig, &newprofile).expect("failed to write to new config file !");
+
+
+    
+}
+
+
 fn create_profile_data(profilename: String,game: String,pathtoprofilecfg: String) ->ProfileInfo {
 
     let profiledata = ProfileInfo{
