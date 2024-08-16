@@ -328,7 +328,7 @@ fn create_new_profile(){
 
     let mut profileconfignew : File = File::create_new(newprofilestring.clone()+"//config" + "//profileconfig.json").expect("Failed to read cfg file !");
 
-    generate_profilecfg(profilename.to_string(),"C:\\Program Files\\Epic Games\\BatmanArkhamKnight\\DLC".to_string(),(newprofilestring.clone() + "//profileconfig.json"));
+    generate_profilecfg(profilename.to_string(),"C:\\Program Files\\Epic Games\\BatmanArkhamKnight\\DLC".to_string(),(newprofilestring.clone()+"//config" + "//profileconfig.json"));
 
     let profiledata = create_profile_data(profilename.to_string(), gamename.to_string(), newprofilestring.to_string());
 
@@ -658,8 +658,8 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 
 
 fn modpathvalue(selectedprofile : String)  -> String {
-    println!("{}",("profiles\\".to_owned() + &selectedprofile + "\\config\\profileconfig.json").to_string());
-    let config = File::open("profiles\\".to_owned() + &selectedprofile + "\\config\\profileconfig.json").expect("failed to read file !");
+   // println!("{}",("profiles\\".to_owned() + &selectedprofile.to_string() + "\\config\\profileconfig.json").to_string());
+    let config = File::open("profiles\\".to_owned() + &selectedprofile.to_string() + "\\config\\profileconfig.json").expect("failed to read file !");
     let configreader = BufReader::new(config);
     let configread : Value = from_reader(configreader).expect("could not read json file ! ...i think ??? idk how this one works too well so idk...");
     // let parsedconfig : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
@@ -779,7 +779,7 @@ fn delete_mod(selectedprofile : String){
     let alteredmodlist = remove_mod_from_cfg( cfgfile.clone(),index.try_into().unwrap());
 
     
-    let mut file : File = File::create(&(selectedprofile.clone() + "\\config\\profileconfig.json")).expect("Failed to read cfg file !");
+    let mut file : File = File::create(&("profiles\\".to_owned() + &selectedprofile.clone() + "\\config\\profileconfig.json")).expect("Failed to read cfg file !");
 
     cfgfile.mods = alteredmodlist.mods;
     to_writer_pretty(&mut file, &cfgfile).expect("Failed to write to file !");
