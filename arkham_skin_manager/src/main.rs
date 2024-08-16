@@ -29,6 +29,28 @@ fn main() {
     if alreadysetup == true{
        
 
+        let mut profilechoice = String::new();
+
+        println!("1. Choose a profile\n2. Create a profile\n\n");
+
+        io::stdin().read_line(&mut profilechoice);
+
+        profilechoice = profilechoice.trim().to_string();
+
+
+        let profilechoice : u8 = profilechoice.parse().expect("failed to read user choice !");
+
+        match profilechoice{
+
+            1 => {}
+            2 => create_new_profile(),
+            _ => main(),
+
+
+        }
+
+
+
     }
 
     else{
@@ -217,6 +239,7 @@ fn functionselection(selectedprofile : String){
         2=> {delete_mod(selectedprofile)},
         3=> {change_mod_loadout(selectedprofile)},
         4=> {profileselection();},
+        6 => {std::process::exit(69420)}
         _ => {functionselection(selectedprofile.clone())}
 
     }

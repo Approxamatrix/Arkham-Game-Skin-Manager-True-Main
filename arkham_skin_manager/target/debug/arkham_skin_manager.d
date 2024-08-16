@@ -1,1 +1,1 @@
-C:\Users\Anish\Documents\Rust\ projects\Arkham\ Game\ Skin\ Manager\arkham_skin_manager\target\debug\arkham_skin_manager.exe: C:\Users\Anish\Documents\Rust\ projects\Arkham\ Game\ Skin\ Manager\arkham_skin_manager\src\main.rs
+C:\Users\Anish\Documents\GitHub\Arkham-Game-Skin-Manager-True-Main\arkham_skin_manager\target\debug\arkham_skin_manager.exe: C:\Users\Anish\Documents\GitHub\Arkham-Game-Skin-Manager-True-Main\arkham_skin_manager\src\main.rs
