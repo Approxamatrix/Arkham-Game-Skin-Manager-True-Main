@@ -38,8 +38,19 @@ fn main() {
         profilechoice = profilechoice.trim().to_string();
 
 
-        let profilechoice : u8 = profilechoice.parse().expect("failed to read user choice !");
 
+    let profilechoiceresult = profilechoice.parse::<u8>();
+
+
+        let profilechoice = match profilechoiceresult{
+
+            Ok(result)=> result,
+            Err(error)=> {
+
+                main();
+                0 //idk how to fix it so just have a 0 lmaooooo
+            },
+        };
         match profilechoice{
 
             1 => {}
@@ -364,7 +375,6 @@ fn read_maincfg(cfgpath : &Path)-> MainConfig{
 
     let cfgdata : MainConfig = from_reader(bufferedreader).expect("failed to fetch data from config file !");
 
-    //.expect("failed to parse data from cfg JSON file !");
     
 
     println!("{:#?} \n",cfgdata);
