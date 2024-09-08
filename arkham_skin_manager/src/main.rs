@@ -1,11 +1,14 @@
+use std::borrow::BorrowMut;
 use std::fs::*;
 use std::io;
 use std::io::BufWriter;
 use std::io::Read;
+use std::num::ParseIntError;
 use std::path;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::exit;
+use std::result;
 use std::vec;
 use fs_extra::*;
 use serde::*;
@@ -229,7 +232,7 @@ fn profileselection() {
 
 fn functionselection(selectedprofile : String){
 
-    let mut featureselection = String::new();
+    let mut featureselectionresult = String::new();
     
     println!("Please choose a feature ! : \n");
 
@@ -239,11 +242,19 @@ fn functionselection(selectedprofile : String){
     println!("4. Back to profiles menu \n");
     println!("6. Exit Program \n");
 
-    io::stdin().read_line(&mut featureselection);
+    io::stdin().read_line(&mut featureselectionresult);
 
-    featureselection = featureselection.trim().to_string();
+    featureselectionresult = featureselectionresult.trim().to_string();
 
-    let featureselection : u8 = featureselection.parse().expect("failed to convert to unsigned 8 bit integer");
+    let featureselectionresult:Result<i32, ParseIntError> = featureselectionresult.parse();
+
+    let featureselection = match featureselectionresult{
+
+        Ok(result) => result,
+        Err(error)=> {println!("Failed to parse result ! Restarting the function selection and also returning a 0 !. Here's the error ya schmuck ! and merry christmas, you filthy animal: {}",error); functionselection(selectedprofile.clone());0},
+
+
+    };
 
     match featureselection{
 
@@ -283,7 +294,24 @@ println!("Hello, would you like to set up a profile ?
 
 let mut profiledecision = String::new();
 
-io::stdin().read_line(&mut profiledecision).expect("Failed to read input");
+let readlineresult = io::stdin().read_line(&mut profiledecision);
+
+let readline = match readlineresult{
+
+    Ok(result) => result,
+    Err(error) => {
+
+        println!("Welp, yuh either forgot to type anything in or something fucked up happened to the code. anyhow, here's the error : {} \n",error);
+        println!("Also, the startup process will now restart ! \n");
+
+        startup();
+
+        0
+
+
+    }
+
+};
 
 
 let mut profiledecision= profiledecision.trim();
@@ -314,19 +342,60 @@ fn create_new_profile(){
 
     let mut profilename: String = String::new();
 
-    io::stdin().read_line(&mut profilename).expect("Failed to read input");
+    let pfnameinputresult = io::stdin().read_line(&mut profilename);
+    
+    let profilename = match pfnameinputresult{
+
+        Ok(result) => result,
+        Err(error) => {
+
+            println!("Failed to read the profile name that you input !\nPlease re-enter it : \n");
+
+            io::stdin().read_line(&mut profilename).expect("seriously ??")
+            
 
 
-    let mut profilename= profilename.trim();
+        },
+
+    };
+
+
+
+    //for the error handling, in the error arm, just ask to re enter the data
+
+
+    let pfnamebind = profilename.to_string();
+    let mut profilename= pfnamebind.trim();
+
 
     println!("Please enter the name of the game you're making the profile for !");
 
     let mut gamename: String = String::new();
 
-    io::stdin().read_line(&mut gamename).expect("Failed to read input");
+    let gamenameresult = io::stdin().read_line(&mut gamename);
+
+    let gamename = match gamenameresult{
+
+        Ok(result) => result,
+        Err(error) => {
+            
+            println!("Error ! {}",error);
+
+            println!("Please re-enter the game's name ! :\n");
+
+            io::stdin().read_line(&mut gamename).expect("seriously ??")
+            
 
 
-    let mut gamename= gamename.trim();
+
+
+        }
+    };
+
+    //for the error handling, in the error arm, just ask to re enter the data
+
+    let gamenamebinding = gamename.to_string();
+    let mut gamename= gamenamebinding.trim();
 
     println!("Please wait.........\nCreating your profile.........");
 
