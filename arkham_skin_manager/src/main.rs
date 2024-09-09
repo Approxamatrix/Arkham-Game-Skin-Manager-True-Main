@@ -406,13 +406,14 @@ fn create_new_profile(){
     create_dir(newprofilestring.clone() + "\\config" ).expect("failed to create mods folder");
 
 
-    let mut profileconfignew : File = File::create_new(newprofilestring.clone()+"//config" + "//profileconfig.json").expect("Failed to read cfg file !");
+    let mut profileconfignew : File = File::create_new(newprofilestring.clone()+"//config" + "//profileconfig.json").expect("Failed to read cfg file !"); //bookmark
+
 
     generate_profilecfg(profilename.to_string(),"C:\\Program Files\\Epic Games\\BatmanArkhamKnight\\DLC".to_string(),(newprofilestring.clone()+"//config" + "//profileconfig.json"));
 
     let profiledata = create_profile_data(profilename.to_string(), gamename.to_string(), newprofilestring.to_string());
 
-    let mut cfgdata = read_maincfg(Path::new("maincfg.json"));
+    let mut cfgdata = read_maincfg(Path::new("maincfg.json")); //bookmark
 
     cfgdata.startupcompleted = true;
 
@@ -420,10 +421,10 @@ fn create_new_profile(){
 
     println!("{:#?}",cfgdata);
 
-    let mut file : File = File::create("maincfg.json").expect("Failed to read cfg file !");
+    let mut file : File = File::create("maincfg.json").expect("Failed to read cfg file !"); //bookmark
 
 
-    to_writer_pretty(&file, &cfgdata);
+    to_writer_pretty(&file, &cfgdata); //bookmark
 
     println!("Finished completing profile !");
     
@@ -438,11 +439,11 @@ fn create_new_profile(){
 
 fn read_maincfg(cfgpath : &Path)-> MainConfig{
 
-    let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !");
+    let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !"); //bookmark
     
     let bufferedreader = BufReader::new(cfgfile);
 
-    let cfgdata : MainConfig = from_reader(bufferedreader).expect("failed to fetch data from config file !");
+    let cfgdata : MainConfig = from_reader(bufferedreader).expect("failed to fetch data from config file !"); //bookmark
 
     
 
@@ -466,9 +467,9 @@ fn generate_profilecfg(profilename: String,dlcfolderpath : String,profilecfgpath
         
     };
 
-    let mut newconfig = File::create(Path::new(&profilecfgpath)).expect("failed to create file !");
+    let mut newconfig = File::create(Path::new(&profilecfgpath)).expect("failed to create file !"); //bookmark
 
-    to_writer_pretty(newconfig, &newprofile).expect("failed to write to new config file !");
+    to_writer_pretty(newconfig, &newprofile).expect("failed to write to new config file !"); //bookmark
 
 
     
@@ -500,7 +501,7 @@ fn remove_profile(){
 
     let mut profilename = profilename.trim();
 
-    for dir in read_dir("profiles").expect("idklmao"){
+    for dir in read_dir("profiles").expect("idklmao"){ //bookmark
         
         let dir = dir.expect("e");
         let path = dir.path();
@@ -548,10 +549,10 @@ fn delete_profiledata(profilename: String){
 
     
     
-    let mut file : File = File::create("maincfg.json").expect("Failed to read cfg file !");
+    let mut file : File = File::create("maincfg.json").expect("Failed to read cfg file !"); //bookmark
 
     
-    to_writer_pretty(&mut file, &profiledata).expect("Failed to write to file !");
+    to_writer_pretty(&mut file, &profiledata).expect("Failed to write to file !"); //bookmark
 
 
 
@@ -568,7 +569,7 @@ fn import_mod(selectedprofile : String) {
 
     let mut modfilepath = String::new();
 
-    io::stdin().read_line(&mut modfilepath).expect("Hey dipshit !! what the fuck did you do ???? \n");
+    io::stdin().read_line(&mut modfilepath).expect("Hey dipshit !! what the fuck did you do ???? \n"); //bookmark
 
     let modfilepath = modfilepath.trim();
     let modfileconverted: PathBuf = modfilepath.clone().parse::<PathBuf>().expect("Failed to get the path for the mod file or smth idk");
@@ -621,7 +622,7 @@ fn import_mod(selectedprofile : String) {
 
     let mut folderselectionstring = String::new();
 
-    io::stdin().read_line(&mut folderselectionstring).expect("Not sure how you broke this but you did. Somehow you broke the selection thing for choosing which mod folder");
+    io::stdin().read_line(&mut folderselectionstring).expect("Not sure how you broke this but you did. Somehow you broke the selection thing for choosing which mod folder"); //bookmark
     
     let folderselectionstring = folderselectionstring.trim();
 
@@ -710,7 +711,7 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 
     println!("{:?}",dlcfolderpath);
     //println!("{:?}",dlcfolderpath1);
-    for entry in read_dir(dlcfolderpath).expect("What ? Help me !") {
+    for entry in read_dir(dlcfolderpath).expect("What ? Help me !") { //bookmark
         let entry = entry.expect(" e ");
         let path = entry.path();
 
@@ -738,9 +739,9 @@ fn scandlcfolder(dlcfolderpath : String) -> Vec<PathBuf>{
 
 fn modpathvalue(selectedprofile : String)  -> String {
    // println!("{}",("profiles\\".to_owned() + &selectedprofile.to_string() + "\\config\\profileconfig.json").to_string());
-    let config = File::open("profiles\\".to_owned() + &selectedprofile.to_string() + "\\config\\profileconfig.json").expect("failed to read file !");
+    let config = File::open("profiles\\".to_owned() + &selectedprofile.to_string() + "\\config\\profileconfig.json").expect("failed to read file !"); //bookmark
     let configreader = BufReader::new(config);
-    let configread : Value = from_reader(configreader).expect("could not read json file ! ...i think ??? idk how this one works too well so idk...");
+    let configread : Value = from_reader(configreader).expect("could not read json file ! ...i think ??? idk how this one works too well so idk..."); //bookmark
     // let parsedconfig : ProfileConfig = serde_json::from_str(&json0).expect("Oh noes ! Failed to parse JSON !");
     
     let dlcfolderpath = configread.get("dlc_folder").expect("couldn't read the DLC folder string from the config file !");
@@ -764,9 +765,9 @@ fn readconfigfile(cfgpath : &Path) -> ProfileConfig {
 
 // this will use the serde_json crate to read the file and print the info.
 
-    let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !");
+    let cfgfile = File::open(cfgpath).expect("failed to open cfg file path !"); //bookmark
     
-    let bufferedreader = BufReader::new(cfgfile);
+    let bufferedreader = BufReader::new(cfgfile); 
 
     let cfgdata : ProfileConfig = from_reader(bufferedreader).expect("failed to fetch data from config file !");
 
@@ -817,10 +818,10 @@ fn add_mod_to_cfg(mut cfgdata : ProfileConfig,jsonformatteddata : ModInfo, selec
 
     println!("{:#?}",cfgdata);
 
-    let mut file : File = File::create("profiles\\".to_owned() + &selectedprofile+ "\\config\\profileconfig.json").expect("Failed to read cfg file !");
+    let mut file : File = File::create("profiles\\".to_owned() + &selectedprofile+ "\\config\\profileconfig.json").expect("Failed to read cfg file !"); //bookmark
 
     //let cfgdata = to_string(&cfgdata).expect("failed to convert to string")
-    to_writer_pretty(&mut file, &cfgdata).expect("Failed to write to file !");
+    to_writer_pretty(&mut file, &cfgdata).expect("Failed to write to file !"); //bookmark
 }
 
 fn delete_mod(selectedprofile : String){
@@ -840,7 +841,7 @@ fn delete_mod(selectedprofile : String){
 
     let index = 0;
     let mut modselection = String::new();
-    io::stdin().read_line(&mut modselection).expect("failed to read line !");
+    io::stdin().read_line(&mut modselection).expect("failed to read line !"); //bookmark
 
     let mut modselection = modselection.trim();
 
@@ -849,7 +850,7 @@ fn delete_mod(selectedprofile : String){
     let mut modselection = modselection - 1;
 
 
-    std::fs::remove_dir_all( &mut cfgfile.mods[modselection].modfolderpath).expect("failed to delete directory");
+    std::fs::remove_dir_all( &mut cfgfile.mods[modselection].modfolderpath).expect("failed to delete directory"); 
 
     
     //std::fs::remove_dir_all( &mut cfgfile.mods[modselection].ogmodlocation).expect("failed to delete directory");
@@ -858,10 +859,10 @@ fn delete_mod(selectedprofile : String){
     let alteredmodlist = remove_mod_from_cfg( cfgfile.clone(),index.try_into().unwrap());
 
     
-    let mut file : File = File::create(&("profiles\\".to_owned() + &selectedprofile.clone() + "\\config\\profileconfig.json")).expect("Failed to read cfg file !");
+    let mut file : File = File::create(&("profiles\\".to_owned() + &selectedprofile.clone() + "\\config\\profileconfig.json")).expect("Failed to read cfg file !"); //bookmark
 
     cfgfile.mods = alteredmodlist.mods;
-    to_writer_pretty(&mut file, &cfgfile).expect("Failed to write to file !");
+    to_writer_pretty(&mut file, &cfgfile).expect("Failed to write to file !"); //bookmark
 
 
     println!("Deleted mod !");
@@ -886,7 +887,7 @@ fn change_mod_loadout(selectedprofile : String)
     let mut jsonfile = readconfigfile(Path::new(&(selectedprofile.clone() + ("\\profileconfig.json"))) );
     let mut modindex = 0;
 
-    let mut file : File = File::create(selectedprofile + ("\\profileconfig.json")).expect("Failed to read cfg file !");
+    let mut file : File = File::create(selectedprofile + ("\\profileconfig.json")).expect("Failed to read cfg file !"); //bookmark
 
 
     for mods in &jsonfile.mods
@@ -913,7 +914,7 @@ fn change_mod_loadout(selectedprofile : String)
     if (jsonfile.mods[modselection].active == true){
 
         jsonfile.mods[modselection].active = false;
-        std::fs::remove_dir_all( &jsonfile.mods[modselection].modfolderpath).expect("failed to delete directory");
+        std::fs::remove_dir_all( &jsonfile.mods[modselection].modfolderpath).expect("failed to delete directory"); //bookmark
     }
 
     else{
@@ -924,13 +925,13 @@ fn change_mod_loadout(selectedprofile : String)
         
 
         jsonfile.mods[modselection].active = true;
-        fs_extra::copy_items(&copypathvec, &jsonfile.mods[modselection].rootmodfolder,&copyoptionstuff).expect("failed to copy mod !");
+        fs_extra::copy_items(&copypathvec, &jsonfile.mods[modselection].rootmodfolder,&copyoptionstuff).expect("failed to copy mod !"); //bookmark
     
 
     }
 
   //  println!("{:#?}",jsonfile.mods[modselection]);
 
-    to_writer_pretty(&mut file, &jsonfile).expect("Failed to write to file !");
+    to_writer_pretty(&mut file, &jsonfile).expect("Failed to write to file !"); //bookmark
 
 }
